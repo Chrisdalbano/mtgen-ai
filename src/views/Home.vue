@@ -20,6 +20,15 @@
         Generate Sample Card
       </button>
     </div>
+    <CardComponent
+      v-if="gptOutput"
+      :cardTitle="cardProperties.name"
+      :cardCost="cardProperties.cost"
+      :cardType="cardProperties.type"
+      :cardDescription="cardProperties.abilities"
+      :cardPower="cardProperties.power"
+      :cardToughness="cardProperties.toughness"
+    />
     <div v-if="gptOutput" class="mt-8">
       <div class="card">
         <div class="card-content">
@@ -32,7 +41,7 @@
           :key="key"
           class="flex justify-center w-auto bg-red-400 rounded mt-2 p-2"
         >
-          {{ key }}: {{ value }}
+          {{ key }}: {{ value }}{ñ}
         </p>
       </div>
     </div>
@@ -40,8 +49,11 @@
 </template>
 
 <script>
+import CardComponent from "@/components/CardComponent.vue";
+
 export default {
   name: "Home",
+  components: { CardComponent },
   data() {
     return {
       prompt: "",
@@ -51,12 +63,13 @@ export default {
         cost: "",
         type: "",
         power: "",
+        art: "",
         toughness: "",
         abilities: "",
-        flavorText: "",
-        artDescription: "",
+        CardComponent,
       },
-      regex: /(.+?)\nMana Cost: (.+?)\nType: (.+?)\nPower\/Toughness: (.+?)\nAbilities: (.+?)\nFlavor Text: (.+?)\nArt Description: (.+)/s,
+      regex:
+        /(.+?)\nMana Cost: (.+?)\nType: (.+?)\nPower\/Toughness: (.+?)\nAbilities: (.+)/s,
     };
   },
   methods: {
@@ -73,8 +86,6 @@ export default {
         power: "",
         toughness: "",
         abilities: "",
-        flavorText: "",
-        artDescription: "",
       };
 
       const prompt = `Generate a Fanmade Magic: The Gathering creature card of ${this.prompt}, the text should be generated to match the following regex ${this.regex}`;
@@ -91,7 +102,8 @@ export default {
         this.gptOutput = cardInfo.gpt_output;
 
         // Extract card properties using regular expressions
-        const regex = /(.+?)\nMana Cost: (.+?)\nType: (.+?)\nPower\/Toughness: (.+?)\nAbilities: (.+?)\nFlavor Text: (.+?)\nArt Description: (.+)/s;
+        const regex =
+          /(.+?)\nMana Cost: (.+?)\nType: (.+?)\nPower\/Toughness: (.+?)\nAbilities: (.+)/s;
         const matches = cardInfo.gpt_output.match(regex);
 
         if (matches) {
@@ -102,8 +114,6 @@ export default {
             power: matches[4].trim().split("/")[0],
             toughness: matches[4].trim().split("/")[1],
             abilities: matches[5].trim(),
-            flavorText: matches[6].trim(),
-            artDescription: matches[7].trim(),
           };
         }
       }
@@ -118,16 +128,11 @@ export default {
         power: "2",
         toughness: "2",
         abilities: "Sample abilities",
-        flavorText: "Enjoy!",
-        artDescription: "Sample art description",
       };
     },
   },
 };
 </script>
-
-
-
 
 <style>
 .card {
