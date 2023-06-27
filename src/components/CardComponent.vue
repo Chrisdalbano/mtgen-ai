@@ -3,39 +3,41 @@
     <div
       class="card-container"
       ref="cardContainer"
-      :style="{ backgroundImage: 'url(' + cardFrame + ')' }"
+      :style="{
+        backgroundImage: 'url(' + cardFrame + ')',
+      }"
     >
       <div class="card-name font-serif text-black font-semibold">
         {{ cardTitle }}
       </div>
-      <div class="card-cost text-black">
-        {{ cardCost }}
-      </div>
+
+      <div
+        class="card-cost mana-symbol flex flex-row text-black"
+        v-html="formatCost(cardCost)"
+      ></div>
+
       <div class="card-type font-serif text-black font-semibold">
         {{ cardType }}
       </div>
       <div
-        class="card-description font-serif text-black"
+        class="card-description font-serif text-black p-1"
         ref="cardDescription"
         :style="{ fontSize: fontSize + 'px' }"
-      >
-        {{ cardDescription }}
-      </div>
+        v-html="formattedDescription"
+      ></div>
       <div class="card-power text-black font-bold">
         {{ cardPower }}/{{ cardToughness }}
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import redFrame from '@/assets/card-frames/red-frame.png'
-import blueFrame from '@/assets/card-frames/blue-frame.png'
-import blackFrame from '@/assets/card-frames/black-frame.png'
-import greenFrame from '@/assets/card-frames/green-frame.png'
-import whiteFrame from '@/assets/card-frames/white-frame.png'
-import multicoloredFrame from '@/assets/card-frames/multicolored-frame.png'
-
+import redFrame from "@/assets/card-frames/red-frame.png";
+import blueFrame from "@/assets/card-frames/blue-frame.png";
+import blackFrame from "@/assets/card-frames/black-frame.png";
+import greenFrame from "@/assets/card-frames/green-frame.png";
+import whiteFrame from "@/assets/card-frames/white-frame.png";
+import multicoloredFrame from "@/assets/card-frames/multicolored-frame.png";
 
 export default {
   name: "CardComponent",
@@ -80,9 +82,48 @@ export default {
       multicoloredFrame,
     };
   },
+  methods: {
+    formatCost(cost) {
+      const symbols = cost.match(/{[^{}]+}/g) || [];
+      symbols.forEach((symbol) => {
+        const iconSrc = this.getSymbol(symbol);
+        const iconTag = `<img src="${iconSrc}" class="mana-symbol" />`;
+        cost = cost.replace(symbol, iconTag);
+      });
+      return cost;
+    },
+    formatDescription(description) {
+      const symbols = description.match(/{[^{}]+}/g) || [];
+      symbols.forEach((symbol) => {
+        const iconSrc = this.getSymbol(symbol);
+        const iconTag = `<img src="${iconSrc}" class="description-symbol" style="display: inline-block; vertical-align: middle; width: 11px; height: 11px;" />`;
+        description = description.replace(symbol, iconTag);
+      });
+      // Wrap the formatted description in a paragraph tag
+      description = `<p>${description}</p>`;
+      return description;
+    },
+    isSymbol(el) {
+      return el.startsWith("{") && el.endsWith("}");
+    },
+    getSymbol(symbol) {
+      const iconName = symbol.replace(/[{}]/g, "");
+      return require(`@/assets/mtg-icons/${iconName}.png`);
+    },
+  },
+
   computed: {
+    formattedDescription() {
+      return this.formatDescription(this.cardDescription);
+    },
+    titleCharCount() {
+      return this.cardTitle.length;
+    },
     charCount() {
       return this.cardDescription.length;
+    },
+    parsedCost() {
+      return this.cardCost.split(/(?<=})|(?={)/g);
     },
     cardFrame() {
       if (this.cardCost.includes("R")) return this.redFrame;
@@ -94,6 +135,13 @@ export default {
     },
   },
   watch: {
+    titleCharCount(newCount) {
+      if (newCount > 18) {
+        this.fontSize = 9;
+      } else {
+        this.fontSize = 11;
+      }
+    },
     charCount(newCount) {
       if (newCount > 181) {
         this.fontSize = 9;
@@ -105,6 +153,9 @@ export default {
   created() {
     // Check the initial character count
     if (this.charCount > 181) {
+      this.fontSize = 9;
+    }
+    if (this.titleCharCount > 18) {
       this.fontSize = 9;
     }
   },
@@ -136,9 +187,8 @@ export default {
 .card-cost {
   position: absolute;
   top: 20px;
-  right: 26px;
-  font-size: 12px; /* you can adjust this as needed */
-  /* border: solid red 1px; */
+  right: 38px;
+  margin-right: 10px;
 }
 
 .card-type {
@@ -161,8 +211,20 @@ export default {
 
 .card-power {
   position: absolute;
-  bottom: 16px;
-  right: 28px;
+  bottom: 18px;
+  right: 32px;
   font-size: 16px; /* adjust as needed */
 }
+.mana-symbol {
+  width: 13px !important;
+  height: 13px !important;
+  margin-top: 1px;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.description-symbol {
+    width: 10px;
+    height: 10px;
+  }
 </style>
