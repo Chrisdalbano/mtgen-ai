@@ -1,4 +1,4 @@
-<template>
+"<template>
   <div class="flex justify-center content-center">
     <div
       class="card-container"
@@ -29,6 +29,9 @@
         {{ cardPower }}/{{ cardToughness }}
       </div>
     </div>
+  </div>
+  <div class="generated-art">
+    <img :src="cardArt" alt="Generated Card Art" />
   </div>
 </template>
 <script>
@@ -226,5 +229,10 @@ export default {
 .description-symbol {
     width: 10px;
     height: 10px;
+  }
+
+  .generated-art {
+    width: 100px;
+    height: 100px;
   }
 </style>
