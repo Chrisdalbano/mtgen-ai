@@ -4,10 +4,16 @@ from flask_cors import CORS
 import json
 import os
 from dotenv import load_dotenv
+import logging
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 load_dotenv()
+
+# Set up logging
+handler = logging.StreamHandler()
+handler.setLevel(logging.ERROR)
+app.logger.addHandler(handler)
 
 
 class CardGenerator:
@@ -21,7 +27,7 @@ class CardGenerator:
             "Authorization": f"Bearer {self.api_key}",
         }
 
-    def generate_card(self, prompt):
+    def generate_card(self, prompt, art_prompt):
         data = {
             "model": self.model_engine,
             "messages": [
@@ -36,8 +42,13 @@ class CardGenerator:
 
         if response.status_code == 200:
             gpt_output = response.json()["choices"][0]["message"]["content"]
-            image_urls = self.generate_image(prompt)  # Generate the image URLs
+            try:
+                image_urls = self.generate_image(art_prompt)  # Generate the image URLs
+            except Exception as e:
+                app.logger.error(f"Failed to generate image URLs: {str(e)}")
+                raise Exception(f"Failed to generate image URLs: {str(e)}")
         else:
+            app.logger.error(f"Request failed with status code {response.status_code}")
             raise Exception(f"Request failed with status code {response.status_code}")
 
         return {
@@ -45,28 +56,35 @@ class CardGenerator:
             "image_urls": image_urls,  # Include the image URLs in the response
         }
 
-    def generate_image(self, prompt, n=1, size="1024x1024"):
+    def generate_image(self, prompt, n=1, size="256x256"):
         data = {
             "prompt": prompt,
             "n": n,
             "size": size,
         }
 
+        print(f"Sending request to DALL-E API with data: {data}")  # Print request data
         response = requests.post(self.dalle_url, headers=self.headers, json=data)
+        print(f"Received response: {response.json()}")  # Print response
 
         if response.status_code == 200:
             image_urls = [image["url"] for image in response.json()["data"]]
         else:
+            app.logger.error(f"Request failed with status code {response.status_code}")
             raise Exception(f"Request failed with status code {response.status_code}")
 
         return image_urls
 
 
+
 @app.route("/generate-card", methods=["POST"])
 def generate_card():
     prompt = request.json["prompt"]
+    art_prompt = request.json["artPrompt"]  # Get the artPrompt from the request
     card_generator = CardGenerator(os.getenv("OPENAI_API_KEY"))
-    card_info = card_generator.generate_card(prompt)
+    card_info = card_generator.generate_card(
+        prompt, art_prompt
+    )  # Pass the artPrompt to generate_card method
     return jsonify(card_info)
 
 

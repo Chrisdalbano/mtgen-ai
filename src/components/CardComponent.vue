@@ -1,4 +1,4 @@
-"<template>
+<template>
   <div class="flex justify-center content-center">
     <div
       class="card-container"
@@ -16,6 +16,10 @@
         v-html="formatCost(cardCost)"
       ></div>
 
+      <div class="card-art" :style="{ backgroundImage: 'url(' + cardArt + ')' }">
+        <div class="generated-art" :style="{ width: '152px' }"></div>
+      </div>
+
       <div class="card-type font-serif text-black font-semibold">
         {{ cardType }}
       </div>
@@ -30,10 +34,8 @@
       </div>
     </div>
   </div>
-  <div class="generated-art">
-    <img :src="cardArt" alt="Generated Card Art" />
-  </div>
 </template>
+
 <script>
 import redFrame from "@/assets/card-frames/red-frame.png";
 import blueFrame from "@/assets/card-frames/blue-frame.png";
@@ -227,12 +229,24 @@ export default {
 }
 
 .description-symbol {
-    width: 10px;
-    height: 10px;
-  }
+  width: 10px;
+  height: 10px;
+}
 
-  .generated-art {
-    width: 100px;
-    height: 100px;
-  }
+.generated-art {
+  display: none;
+}
+
+.card-art {
+  border: solid red 1px;
+  position: absolute;
+  top: 40px; /* this might be the middle of the card, adjust as needed */
+  left: 22px;
+  right: 22px; /* add some padding on the right side */
+  bottom: 155px;
+  font-size: 11px; /* adjust as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 </style>
