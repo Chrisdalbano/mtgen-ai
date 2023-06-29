@@ -7,7 +7,7 @@
         backgroundImage: 'url(' + cardFrame + ')',
       }"
     >
-      <div class="card-name font-jacebeleren text-black font-semibold">
+      <div class="card-name font-belerenbold text-black">
         {{ cardTitle }}
       </div>
 
@@ -27,7 +27,7 @@
         {{ cardType }}
       </div>
       <div
-        class="card-description font-mplantin text-black p-1"
+        class="card-description font-mplantin text-black p-0.5"
         ref="cardDescription"
         :style="{ fontSize: fontSize + 'px' }"
         v-html="formattedDescription"
@@ -213,6 +213,7 @@ export default {
   top: 20px;
   left: 25px;
   font-size: 12px; /* you can adjust this as needed */
+  cursor: default;
 }
 
 .card-cost {
@@ -228,6 +229,7 @@ export default {
   top: 199px;
   left: 25px;
   font-size: 10px; /* you can adjust this as needed */
+  cursor: default;
 }
 
 .card-description {
@@ -239,20 +241,23 @@ export default {
   bottom: 40px;
   font-size: 11px; /* adjust as needed */
   overflow: auto;
+  cursor: default;
 }
 
 .card-power {
   position: absolute;
   bottom: 16px;
   right: 30px;
-  font-size: 16px; /* adjust as needed */
+  font-size: 16px; 
+  cursor: default;
 }
 .mana-symbol {
-  width: 13px !important;
-  height: 13px !important;
+  width: 12px !important;
+  height: 12px !important;
   margin-top: 1px;
   padding: 0;
   vertical-align: middle;
+  
 }
 
 .description-symbol {

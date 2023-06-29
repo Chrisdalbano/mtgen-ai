@@ -8,6 +8,7 @@ module.exports = {
         'matrix': ['"Bad Script"', 'cursive'],
         'mplantin': ['MPlantin', 'serif'],
         'jacebeleren': ['JaceBeleren', 'serif'],
+        'belerenbold' : ['BelerenBold', 'bold'],
       }
     },
   },

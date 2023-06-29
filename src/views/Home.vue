@@ -1,54 +1,38 @@
 <template>
   <div class="flex flex-col items-center justify-center h-screen bg-gray-100">
-    <h1 class="text-3xl font-bold mb-4">MTG Card Generator</h1>
+    <h1 class="text-4xl font-belerenbold text-gray-200 mb-2">
+      Magic The Generator
+    </h1>
+    <h2 class="text-sm font-jacebeleren mb-4 text-gray-200">
+      An AI MTG Card generator
+    </h2>
     <div class="flex flex-col items-center">
       <input
         v-model="prompt"
-        class="border border-gray-400 rounded-md px-4 py-2 w-80 mb-4"
-        placeholder="Enter a prompt"
+        class="border border-gray-400 bg-gray-900 text-gray-200 font-jacebeleren rounded-sm px-4 py-2 w-80 mb-4"
+        placeholder="Type your card"
       />
       <button
         @click="generateCard"
-        class="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-4 py-2"
+        class="bg-orange-600 hover:bg-orange-700 text-gray-100 rounded-sm font-belerenbold px-4 py-2"
+        :disabled="loading"
       >
         Generate Card
       </button>
-      <button
-        @click="generateSampleCard"
-        class="bg-gray-500 hover:bg-gray-600 text-white rounded-md px-4 py-2 mt-4"
-      >
-        Generate Sample Card
-      </button>
+      <div v-if="loading" class="spinner"></div>
     </div>
     <div class="mt-2">
       <CardComponent
-      v-if="gptOutput"
-      :cardTitle="cardProperties.name"
-      :cardCost="cardProperties.cost"
-      :cardType="cardProperties.type"
-      :cardDescription="cardProperties.abilities"
-      :cardPower="cardProperties.power"
-      :cardToughness="cardProperties.toughness"
-      :cardArt="cardProperties.art"
-    />
+        v-if="gptOutput"
+        :cardTitle="cardProperties.name"
+        :cardCost="cardProperties.cost"
+        :cardType="cardProperties.type"
+        :cardDescription="cardProperties.abilities"
+        :cardPower="cardProperties.power"
+        :cardToughness="cardProperties.toughness"
+        :cardArt="cardProperties.art"
+      />
     </div>
-    
-    <!-- <div v-if="gptOutput" class="mt-8">
-      <div class="card">
-        <div class="card-content">
-          <div class="text-med">{{ gptOutput }}</div>
-        </div>
-      </div>
-      <div>
-        <p
-          v-for="(value, key) in cardProperties"
-          :key="key"
-          class="flex justify-center w-auto bg-red-400 rounded mt-2 p-2"
-        >
-          {{ key }}: {{ value }}
-        </p>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -60,6 +44,7 @@ export default {
   components: { CardComponent },
   data() {
     return {
+      loading: false,
       prompt: "",
       gptOutput: "",
       cardProperties: {
@@ -90,6 +75,8 @@ export default {
       if (!this.prompt) {
         return;
       }
+
+      this.loading = true;
 
       this.gptOutput = "";
       this.cardProperties = {
@@ -141,6 +128,7 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
             art: cardInfo.image_urls[0], // Assign the first image URL to art property
           };
         }
+        this.loading = false;
       }
     },
     generateSampleCard() {
@@ -163,7 +151,6 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
 .card {
   width: 600px;
   height: auto;
-  background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -179,5 +166,32 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
 .text-med {
   font-size: 24px;
   line-height: 1.5;
+}
+
+.bg-gray-100 {
+  background: url("../assets/pics/mtgen-bg.png") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.spinner {
+  margin-top: 1rem;
+  border: 14px solid #f3f3f3;
+  border-top: 14px solid #8f2a02;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
