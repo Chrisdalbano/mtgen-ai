@@ -20,7 +20,8 @@
         Generate Sample Card
       </button>
     </div>
-    <CardComponent
+    <div class="mt-2">
+      <CardComponent
       v-if="gptOutput"
       :cardTitle="cardProperties.name"
       :cardCost="cardProperties.cost"
@@ -30,7 +31,9 @@
       :cardToughness="cardProperties.toughness"
       :cardArt="cardProperties.art"
     />
-    <div v-if="gptOutput" class="mt-8">
+    </div>
+    
+    <!-- <div v-if="gptOutput" class="mt-8">
       <div class="card">
         <div class="card-content">
           <div class="text-med">{{ gptOutput }}</div>
@@ -42,10 +45,10 @@
           :key="key"
           class="flex justify-center w-auto bg-red-400 rounded mt-2 p-2"
         >
-          {{ key }}: {{ value }}{ñ}
+          {{ key }}: {{ value }}
         </p>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -73,6 +76,16 @@ export default {
     };
   },
   methods: {
+    createCardText(card) {
+      let text = `
+    ${card.cardName}
+    ${card.cost}
+    ${card.type}
+    ${card.description}
+    ${card.power}/${card.toughness}
+  `;
+      return text.trim();
+    },
     async generateCard() {
       if (!this.prompt) {
         return;
@@ -89,8 +102,17 @@ export default {
         art: "", // Add the art property here
       };
 
-      const prompt = `Generate a Fanmade Magic The Gathering creature card of ${this.prompt}, the text should be generated to match the following regex ${this.regex}, also make sure that our output method expects your mana costs to be in a format like for example: {2}{B}{B} for 2BB, same for activate abilities, or {T} for tap action, and so on with the rest... Do not include flavor text. You are not generating images or graphics.`;
-      const artPrompt = `Magic The Gathering creature of ${this.prompt}, Magic The Gathering Art Style, creature should have respective action pose and background related to the creature backstory.`;
+      const prompt = `Generate a fan-made Magic: The Gathering creature card based on the theme '${this.prompt}'. The output should match the specified format given by the following regex pattern: ${this.regex}.
+
+Adhere to the following guidelines:
+
+Use the specific notation for all action symbols, enclosed in '{}'. For example, use '{T}' for the tap action and '{UT}' for the untap action.
+Each paragraph or individual block of text should end with a newline character ('\n') to denote the start of a new line.
+Exclude flavor text and explanation, DO NOT ADD ANY FLAVOR TEXT or any extra text.
+Avoid generating images or graphics.
+The card structure should reflect a traditional Magic: The Gathering card, ensuring clarity in the cost, type, and abilities of the card, exclude any flavor text or extra lore/descriptive text. Make sure that the text is clear and free of ambiguity for easy parsing and matching with the provided regex pattern.`;
+
+      const artPrompt = `Magic The Gathering Creature Art of ${this.prompt}, with Magic The Gathering Art Style, creature should have action pose and thematic background.`;
 
       const response = await fetch("http://127.0.0.1:5000/generate-card", {
         method: "POST",

@@ -1,3 +1,17 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@font-face {
+  font-family: "MPlantin";
+  src: url("./assets/mtg-fonts/MPlantin.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "JaceBeleren";
+  src: url("./assets/mtg-fonts/JaceBeleren-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}

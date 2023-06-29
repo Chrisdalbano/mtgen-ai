@@ -6,6 +6,8 @@ module.exports = {
       fontFamily: {
         'beleren': ['"Cinzel"', 'serif'],
         'matrix': ['"Bad Script"', 'cursive'],
+        'mplantin': ['MPlantin', 'serif'],
+        'jacebeleren': ['JaceBeleren', 'serif'],
       }
     },
   },

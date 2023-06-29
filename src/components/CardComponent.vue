@@ -7,7 +7,7 @@
         backgroundImage: 'url(' + cardFrame + ')',
       }"
     >
-      <div class="card-name font-serif text-black font-semibold">
+      <div class="card-name font-jacebeleren text-black font-semibold">
         {{ cardTitle }}
       </div>
 
@@ -16,20 +16,23 @@
         v-html="formatCost(cardCost)"
       ></div>
 
-      <div class="card-art" :style="{ backgroundImage: 'url(' + cardArt + ')' }">
+      <div
+        class="card-art"
+        :style="{ backgroundImage: 'url(' + cardArt + ')' }"
+      >
         <div class="generated-art" :style="{ width: '152px' }"></div>
       </div>
 
-      <div class="card-type font-serif text-black font-semibold">
+      <div class="card-type font-jacebeleren text-black font-semibold">
         {{ cardType }}
       </div>
       <div
-        class="card-description font-serif text-black p-1"
+        class="card-description font-mplantin text-black p-1"
         ref="cardDescription"
         :style="{ fontSize: fontSize + 'px' }"
         v-html="formattedDescription"
       ></div>
-      <div class="card-power text-black font-bold">
+      <div class="card-power text-black font-jacebeleren">
         {{ cardPower }}/{{ cardToughness }}
       </div>
     </div>
@@ -104,6 +107,8 @@ export default {
         const iconTag = `<img src="${iconSrc}" class="description-symbol" style="display: inline-block; vertical-align: middle; width: 11px; height: 11px;" />`;
         description = description.replace(symbol, iconTag);
       });
+      // Replace '\n' with <br/>
+      description = description.replace(/\\n/g, "<br/>");
       // Wrap the formatted description in a paragraph tag
       description = `<p>${description}</p>`;
       return description;
@@ -114,6 +119,21 @@ export default {
     getSymbol(symbol) {
       const iconName = symbol.replace(/[{}]/g, "");
       return require(`@/assets/mtg-icons/${iconName}.png`);
+    },
+
+    adjustFontSize() {
+      const cardDescriptionElement = this.$refs.cardDescription;
+      const maxIterations = 10; // Maximum number of iterations to reduce font size
+      let iterations = 0;
+
+      while (
+        cardDescriptionElement.scrollHeight >
+          cardDescriptionElement.clientHeight &&
+        iterations < maxIterations
+      ) {
+        this.fontSize -= 1;
+        iterations++;
+      }
     },
   },
 
@@ -153,6 +173,12 @@ export default {
       } else {
         this.fontSize = 11;
       }
+    },
+    cardDescription: {
+      handler() {
+        this.$nextTick(this.adjustFontSize);
+      },
+      immediate: true,
     },
   },
   created() {
@@ -199,7 +225,7 @@ export default {
 .card-type {
   /* border: solid red 1px; */
   position: absolute;
-  top: 198px;
+  top: 199px;
   left: 25px;
   font-size: 10px; /* you can adjust this as needed */
 }
@@ -212,12 +238,13 @@ export default {
   right: 24px; /* add some padding on the right side */
   bottom: 40px;
   font-size: 11px; /* adjust as needed */
+  overflow: auto;
 }
 
 .card-power {
   position: absolute;
-  bottom: 18px;
-  right: 32px;
+  bottom: 16px;
+  right: 30px;
   font-size: 16px; /* adjust as needed */
 }
 .mana-symbol {
@@ -233,20 +260,17 @@ export default {
   height: 10px;
 }
 
-.generated-art {
-  display: none;
-}
-
 .card-art {
-  border: solid red 1px;
   position: absolute;
-  top: 40px; /* this might be the middle of the card, adjust as needed */
+  top: 40px;
   left: 22px;
-  right: 22px; /* add some padding on the right side */
+  right: 22px;
   bottom: 155px;
-  font-size: 11px; /* adjust as needed */
-  background-size: contain;
+  font-size: 11px;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  width: 207px;
+  height: 154px;
 }
 </style>
