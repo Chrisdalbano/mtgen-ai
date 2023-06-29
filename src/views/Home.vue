@@ -11,10 +11,25 @@
         v-model="prompt"
         class="border border-gray-400 bg-gray-900 text-gray-200 font-jacebeleren rounded-sm px-4 py-2 w-80 mb-4"
         placeholder="Type your card"
+        autocomplete="off"
+      />
+      <button
+        @click="showApiKeyInput = !showApiKeyInput"
+        class="text-gray-300 text-xs font-belerenbold px-4 py-2"
+      >
+        Add OpenAI API Key
+      </button>
+      <input
+        v-if="showApiKeyInput"
+        v-model="apiKey"
+        type="password"
+        class="border border-gray-400 bg-gray-900 text-gray-200 font-jacebeleren rounded-sm text-xs px-4 py-2 w-40 mb-4"
+        placeholder="API key"
+        autocomplete="off"
       />
       <button
         @click="generateCard"
-        class="bg-orange-600 hover:bg-orange-700 text-gray-100 rounded-sm font-belerenbold px-4 py-2"
+        class="bg-orange-600 hover:bg-orange-700 text-gray-100 rounded-sm font-belerenbold px-4 py-2 mt-4"
         :disabled="loading"
       >
         Generate Card
@@ -46,6 +61,8 @@ export default {
     return {
       loading: false,
       prompt: "",
+      apiKey: "",
+      showApiKeyInput: false,
       gptOutput: "",
       cardProperties: {
         name: "",
@@ -77,8 +94,7 @@ export default {
       }
 
       this.loading = true;
-
-      this.gptOutput = "";
+      apiKey: "", (this.gptOutput = "");
       this.cardProperties = {
         name: "",
         cost: "",
@@ -105,8 +121,9 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-API-Key": this.apiKey, // Include the API key in the request headers
         },
-        body: JSON.stringify({ prompt, artPrompt }), // Pass both prompts to the API
+        body: JSON.stringify({ prompt, artPrompt }),
       });
 
       if (response.ok) {
@@ -194,6 +211,4 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
     transform: rotate(360deg);
   }
 }
-
-
 </style>

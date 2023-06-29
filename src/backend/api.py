@@ -80,11 +80,10 @@ class CardGenerator:
 @app.route("/generate-card", methods=["POST"])
 def generate_card():
     prompt = request.json["prompt"]
-    art_prompt = request.json["artPrompt"]  # Get the artPrompt from the request
-    card_generator = CardGenerator(os.getenv("OPENAI_API_KEY"))
-    card_info = card_generator.generate_card(
-        prompt, art_prompt
-    )  # Pass the artPrompt to generate_card method
+    art_prompt = request.json["artPrompt"]
+    api_key = request.headers.get("X-API-Key")  # Get the API key from the request headers
+    card_generator = CardGenerator(api_key)  # Use the API key from the request
+    card_info = card_generator.generate_card(prompt, art_prompt)
     return jsonify(card_info)
 
 
