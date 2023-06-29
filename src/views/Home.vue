@@ -178,12 +178,12 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
 
 .spinner {
   margin-top: 1rem;
-  border: 14px solid #f3f3f3;
+  border: 14px solid #220800;
   border-top: 14px solid #8f2a02;
   border-radius: 50%;
   width: 70px;
   height: 70px;
-  animation: spin 0.5s linear infinite;
+  animation: spin 0.4s linear infinite;
 }
 
 @keyframes spin {
@@ -194,4 +194,6 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
     transform: rotate(360deg);
   }
 }
+
+
 </style>

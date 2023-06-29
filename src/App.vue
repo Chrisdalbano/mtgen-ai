@@ -1,7 +1,7 @@
 <template>
   <!-- <NavBar/> -->
   <router-view />
-  <footer class="bg-gray-900 text-gray-200 p-4">
+  <footer class="bg-gray-900 text-gray-200 p-4 font-beleren">
     <p class="text-center">
       Made with ❤️ by
       <a

@@ -1,28 +1,26 @@
 <template>
-  <div class="flex justify-center content-center">
+  <div class="flex justify-center content-center" @mousemove="handleMouseMove">
     <div
       class="card-container"
       ref="cardContainer"
       :style="{
         backgroundImage: 'url(' + cardFrame + ')',
+        transform: `rotateX(${position.y}deg) rotateY(${position.x}deg)`
       }"
     >
       <div class="card-name font-belerenbold text-black">
         {{ cardTitle }}
       </div>
-
       <div
         class="card-cost mana-symbol flex flex-row text-black"
         v-html="formatCost(cardCost)"
       ></div>
-
       <div
         class="card-art"
         :style="{ backgroundImage: 'url(' + cardArt + ')' }"
       >
         <div class="generated-art" :style="{ width: '152px' }"></div>
       </div>
-
       <div class="card-type font-jacebeleren text-black font-semibold">
         {{ cardType }}
       </div>
@@ -88,9 +86,14 @@ export default {
       greenFrame,
       whiteFrame,
       multicoloredFrame,
+      position: { x: 0, y: 0 }, // Initial position for the parallax effect
     };
   },
   methods: {
+    handleMouseMove(e) {
+      this.position.x = (e.pageX - this.$refs.cardContainer.offsetLeft - (this.$refs.cardContainer.offsetWidth / 2)) / 10;
+      this.position.y = -1 * (e.pageY - this.$refs.cardContainer.offsetTop - (this.$refs.cardContainer.offsetHeight / 2)) / 10;
+    },
     formatCost(cost) {
       const symbols = cost.match(/{[^{}]+}/g) || [];
       symbols.forEach((symbol) => {
