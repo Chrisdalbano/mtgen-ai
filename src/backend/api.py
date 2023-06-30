@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import logging
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/generate-card": {"origins": "http://localhost:8080"}})
 load_dotenv()
 
 # Set up logging
