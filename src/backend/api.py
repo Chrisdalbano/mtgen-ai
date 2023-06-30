@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 import logging
 
 app = Flask(__name__)
-CORS(app, resources={r"/generate-card": {"origins": "http://localhost:8080"}})
+CORS(
+    app, resources={r"/generate-card": {"origins": "http://localhost:8080"}}
+)  # Modify the origins value according to your needs
 load_dotenv()
 
 # Set up logging
@@ -76,12 +78,24 @@ class CardGenerator:
         return image_urls
 
 
+# Disable CORS enforcement on Azure App Service
+@app.after_request
+def after_request(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers[
+        "Access-Control-Allow-Headers"
+    ] = "Content-Type,Authorization,X-API-Key"
+    response.headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
+    return response
+
 
 @app.route("/generate-card", methods=["POST"])
 def generate_card():
     prompt = request.json["prompt"]
     art_prompt = request.json["artPrompt"]
-    api_key = request.headers.get("X-API-Key")  # Get the API key from the request headers
+    api_key = request.headers.get(
+        "X-API-Key"
+    )  # Get the API key from the request headers
     card_generator = CardGenerator(api_key)  # Use the API key from the request
     card_info = card_generator.generate_card(prompt, art_prompt)
     return jsonify(card_info)
