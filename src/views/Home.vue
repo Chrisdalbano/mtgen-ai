@@ -117,14 +117,26 @@ The card structure should reflect a traditional Magic: The Gathering card, ensur
 
       const artPrompt = `Magic The Gathering Creature Art of ${this.prompt}, with Magic The Gathering Art Style, creature should have action pose and thematic background.`;
 
-      const response = await fetch("http://127.0.0.1:5000/generate-card", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": this.apiKey, // Include the API key in the request headers
-        },
-        body: JSON.stringify({ prompt, artPrompt }),
-      });
+      // const response = await fetch("http://127.0.0.1:5000/generate-card", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "X-API-Key": this.apiKey, // Include the API key in the request headers
+      //   },
+      //   body: JSON.stringify({ prompt, artPrompt }),
+      // });
+
+      const response = await fetch(
+        "https://mtgenapi.azurewebsites.net/generate-card",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": this.apiKey, // Include the API key in the request headers
+          },
+          body: JSON.stringify({ prompt, artPrompt }),
+        }
+      );
 
       if (response.ok) {
         const cardInfo = await response.json();
