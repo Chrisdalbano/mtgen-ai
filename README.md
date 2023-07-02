@@ -33,3 +33,10 @@ To generate a card, input a theme or prompt in the input box and click the "Gene
 
 ### Contributions
 Contributions to this project are welcome. Please submit a pull request or open an issue to discuss your proposed changes.
+
+### Running the API
+A Flask api is stored in the src\backend\api.py make sure to run it using
+```bash
+python src/backend/api.py
+```
+
