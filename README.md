@@ -40,3 +40,7 @@ A Flask api is stored in the src\backend\api.py make sure to run it using
 python src/backend/api.py
 ```
 
+### Visit the Live website here:
+
+https://mtgen-host.web.app/#/
+
