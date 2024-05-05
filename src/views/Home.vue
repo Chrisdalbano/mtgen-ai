@@ -6,17 +6,20 @@
     <h2 class="text-base mb-4 text-gray-200">An AI MTG Card generator</h2>
     <div class="flex flex-col items-center">
       <input v-model="prompt" class="border border-gray-400 bg-gray-900 text-gray-200 font-jacebeleren rounded-sm px-4 py-2 w-80 mb-4" placeholder="Type your card" autocomplete="off" />
-      <button @click="showApiKeyInput = !showApiKeyInput" class="text-gray-300 text-m font-mplantin px-4 py-2 m-2 rounded border-solid border-2 border-white">
+      <!-- <button @click="showApiKeyInput = !showApiKeyInput" class="text-gray-300 text-m font-mplantin px-4 py-2 m-2 rounded border-solid border-2 border-white">
         Add OpenAI API Key
-      </button>
+      </button> -->
       <input v-if="showApiKeyInput" v-model="apiKey" type="password" class="border border-gray-400 bg-gray-900 text-gray-200 font-jacebeleren rounded-sm text-xs px-4 py-2 w-40 mb-4" placeholder="API key" autocomplete="off" />
       <button @click="generateCard" class="bg-orange-600 hover:bg-orange-700 text-gray-100 rounded-sm font-belerenbold px-4 py-2 mt-4" :disabled="loading">
         Generate Card
       </button>
+      <button @click="generateTestCard" class="bg-green-600 hover:bg-green-700 text-white rounded-sm font-belerenbold px-4 py-2 mt-2">
+        Generate Test Card
+      </button>
       <div v-if="loading" class="spinner"></div>
     </div>
     <div class="mt-2">
-      <CardComponent v-if="gptOutput" :cardTitle="cardProperties.name" :cardCost="cardProperties.cost" :cardType="cardProperties.type" :cardDescription="cardProperties.abilities" :cardPower="cardProperties.power" :cardToughness="cardProperties.toughness" :cardArt="cardProperties.art" />
+      <CardComponent v-if="gptOutput || testCard" :cardTitle="cardProperties.name" :cardCost="cardProperties.cost" :cardType="cardProperties.type" :cardDescription="cardProperties.abilities" :cardPower="cardProperties.power" :cardToughness="cardProperties.toughness" :cardArt="cardProperties.art" />
     </div>
   </div>
 </template>
@@ -34,14 +37,15 @@ export default {
       apiKey: "",
       showApiKeyInput: false,
       gptOutput: "",
+      testCard: false,
       cardProperties: {
-        name: "",
-        cost: "",
-        type: "",
-        power: "",
-        toughness: "",
-        abilities: "",
-        art: "",
+        name: "Test Dragon",
+        cost: "{5}{R}{R}",
+        type: "Creature - Dragon",
+        power: "5",
+        toughness: "5",
+        abilities: "Flying, {T}: This creature deals 3 damage to any target.",
+        art: "https://assetsio.gnwcdn.com/Mechanical_Whelp_full2.jpg?width=1920&height=1920&fit=bounds&quality=80&format=jpg&auto=webp",
       },
       regex: /.*\*\*Name:\*\* (.+?)\n\*\*Mana Cost:\*\* (.+?)\n\*\*Type:\*\* (.+?)\n\*\*Power\/Toughness:\*\* (.+?)\n\*\*Abilities:\*\* ([\s\S]+?)(?:\n\*\*Flavor Text:.*|$)/,
     };
@@ -52,17 +56,10 @@ export default {
         alert("Please enter a prompt.");
         return;
       }
-
       this.loading = true;
-      const textPrompt = `Generate a Magic: The Gathering card description for a creature. Use only the format provided below and exclude any additional text or elements. Creature name: '${this.prompt}'.
-**Name:** <name>
-**Mana Cost:** <cost>
-**Type:** <type>
-**Power/Toughness:** <power/toughness>
-**Abilities:** <abilities>`;
-      
-      const artPrompt = `Create a fantastical creature in a dynamic pose based on fanmade ${this.prompt}, embodying themes of strength and mystery, suitable for a high fantasy card game. The creature should have distinctive features such as vibrant colors, mystical elements, and an imposing presence, and a fitting background to its theme.`;
-
+      this.testCard = false; // Ensure normal card generation flow
+      const textPrompt = `Generate a Magic: The Gathering card description for a creature. Use only the format provided below and exclude any additional text or elements. Creature name: '${this.prompt}'.\n**Name:** <name>\n**Mana Cost:** <cost>\n**Type:** <type>\n**Power/Toughness:** <power/toughness>\n**Abilities:** <abilities>`;
+      const artPrompt = `Create a fantastical creature in a dynamic pose based on fanmade ${this.prompt}, embodying themes of strength and mystery, suitable for a high fantasy card game. The creature should have distinctive features such as vibrant colors, mystical elements, and an imposing presence, and a fitting background to its theme. Centered Character. Centered with no border.  4:3 Aspect Ratio`;
       try {
         const response = await fetch(
           "https://us-central1-mtgen-host.cloudfunctions.net/generateCard",
@@ -72,11 +69,9 @@ export default {
             body: JSON.stringify({ textPrompt, artPrompt }),
           }
         );
-
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const cardInfo = await response.json();
         this.gptOutput = cardInfo.gpt_output;
         const matches = this.gptOutput.match(this.regex);
@@ -100,6 +95,18 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    generateTestCard() {
+      this.testCard = true;
+      this.cardProperties = {
+        name: "Test Dragon",
+        cost: "{5}{R}{R}",
+        type: "Creature - Dragon",
+        power: "5",
+        toughness: "5",
+        abilities: "Flying, {T}: This creature deals 3 damage to any target.",
+        art: "https://assetsio.gnwcdn.com/Mechanical_Whelp_full2.jpg?width=1920&height=1920&fit=bounds&quality=80&format=jpg&auto=webp",
+      };
     },
   },
 };

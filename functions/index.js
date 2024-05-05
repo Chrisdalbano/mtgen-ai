@@ -54,21 +54,33 @@ async function generateText(prompt) {
 }
 
 async function generateImage(prompt) {
-  const data = { prompt: prompt, n: 1, size: "256x256" };
+  // Updating the function to use dall-e-3 and potentially higher resolution
+  const data = {
+    model: "dall-e-3",  // Specify the model version
+    prompt: prompt,      // Using the prompt passed to the function
+    n: 1,                // Number of images to generate
+    size: "1024x1024"    // Requesting a larger image size; adjust as needed
+  };
+
   try {
     const response = await fetch(
       "https://api.openai.com/v1/images/generations",
       {
         method: "POST",
-        headers: headers,
+        headers: headers,  // Make sure the 'headers' variable includes your API key
         body: JSON.stringify(data),
       }
     );
-    if (!response.ok)
+
+    if (!response.ok) {
       throw new Error(`API call failed with status ${response.status}`);
-    return (await response.json()).data.map((img) => img.url);
+    }
+
+    const jsonResponse = await response.json();
+    return jsonResponse.data.map((img) => img.url);
   } catch (error) {
     console.error("Failed to generate image:", error);
-    throw error; // Re-throw to handle it in the calling function
+    throw error; // Re-throw the error for handling in the calling function
   }
 }
+
