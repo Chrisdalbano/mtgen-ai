@@ -25,7 +25,7 @@
         {{ cardType }}
       </div>
       <div
-        class="card-description font-mplantin text-black p-0.5"
+        class="card-description font-mplantin text-black py-0.5 px-1.5"
         ref="cardDescription"
         :style="{ fontSize: fontSize + 'px' }"
         v-html="formattedDescription"
@@ -89,7 +89,7 @@ export default {
       position: { x: 0, y: 0 }, // Initial position for the parallax effect
     };
   },
- 
+
   methods: {
     handleMouseMove(e) {
       this.position.x =
@@ -105,30 +105,73 @@ export default {
         10;
     },
     formatCost(cost) {
-      return cost.replace(/(\d+|[WUBRGX])/g, (match) => {
-        if (!isNaN(match)) {
-          // If it's a number, return as is
-          return match;
-        } else {
-          // Otherwise, convert to mana symbol
-          const iconSrc = require(`@/assets/mtg-icons/${match.toUpperCase()}.png`);
-          return `<img src="${iconSrc}" class="mana-symbol" />`;
-        }
+      // Define a mapping from common textual descriptions to mana symbols
+      const manaMap = {
+        green: "G",
+        forest: "G",
+        fire: "R",
+        red: "R",
+        water: "U",
+        blue: "U",
+        death: "B",
+        black: "B",
+        white: "W",
+        light: "W",
+        earth: "G",
+        stone: "G",
+        // Add any other specific mappings as needed
+      };
+
+      // Update regex to capture numerical costs and defined keywords
+      const costRegex =
+        /(\d+ [WUBRGwubrg]|[WUBRGwubrg]|\d+|\b(?:green|forest|fire|red|water|blue|death|black|white|light|earth|stone)\b)/gi;
+
+      let formattedCost = cost.replace(costRegex, (match) => {
+        const trimmedMatch = match.trim().toLowerCase(); // Convert to lowercase for consistency
+        let parts = trimmedMatch.split(/\s+/); // Split numbers and letters
+        let result = "";
+
+        parts.forEach((part) => {
+          if (!isNaN(part)) {
+            // If it's a numeric cost
+            const iconSrc = require(`@/assets/mtg-icons/${part}.png`); // Assume numeric icons are named 'number_X.png'
+            result += `<img src="${iconSrc}" class="mana-symbol" />`;
+          } else if (manaMap[part]) {
+            // If it's a mapped keyword
+            const color = manaMap[part];
+            const iconSrc = require(`@/assets/mtg-icons/${color}.png`);
+            result += `<img src="${iconSrc}" class="mana-symbol" />`;
+          } else {
+            // If it's a single letter mana cost not covered by keywords
+            const color = part.charAt(0).toUpperCase(); // Ensure first char is uppercase for consistency
+            const iconSrc = require(`@/assets/mtg-icons/${color}.png`);
+            result += `<img src="${iconSrc}" class="mana-symbol" />`;
+          }
+        });
+        return result;
       });
+      return formattedCost;
     },
+
     formatDescription(description) {
+      // Handle mana and other symbols first
       const symbols = description.match(/{[^{}]+}/g) || [];
       symbols.forEach((symbol) => {
         const iconSrc = this.getSymbol(symbol);
         const iconTag = `<img src="${iconSrc}" class="description-symbol" style="display: inline-block; vertical-align: middle; width: 11px; height: 11px;" />`;
         description = description.replace(symbol, iconTag);
       });
-      // Replace '\n' with <br/>
-      description = description.replace(/\\n/g, "<br/>");
-      // Wrap the formatted description in a paragraph tag
-      description = `<p>${description}</p>`;
-      return description;
+
+      // Handle bold text enclosed in double asterisks
+      description = description.replace(/\*\*(.*?)\*\*/g, "$1<br/>");
+
+      // Replace '\n' with <br/> for new lines
+      description = description.replace(/\n/g, "<br/>");
+
+      // Return the formatted description wrapped in a paragraph tag
+      return `<p>${description}</p>`;
     },
+
     isSymbol(el) {
       return el.startsWith("{") && el.endsWith("}");
     },
