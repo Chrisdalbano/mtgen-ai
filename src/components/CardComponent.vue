@@ -5,7 +5,7 @@
       ref="cardContainer"
       :style="{
         backgroundImage: 'url(' + cardFrame + ')',
-        transform: `rotateX(${position.y}deg) rotateY(${position.x}deg)`
+        transform: `rotateX(${position.y}deg) rotateY(${position.x}deg)`,
       }"
     >
       <div class="card-name font-belerenbold text-black">
@@ -89,19 +89,32 @@ export default {
       position: { x: 0, y: 0 }, // Initial position for the parallax effect
     };
   },
+ 
   methods: {
     handleMouseMove(e) {
-      this.position.x = (e.pageX - this.$refs.cardContainer.offsetLeft - (this.$refs.cardContainer.offsetWidth / 2)) / 10;
-      this.position.y = -1 * (e.pageY - this.$refs.cardContainer.offsetTop - (this.$refs.cardContainer.offsetHeight / 2)) / 10;
+      this.position.x =
+        (e.pageX -
+          this.$refs.cardContainer.offsetLeft -
+          this.$refs.cardContainer.offsetWidth / 2) /
+        10;
+      this.position.y =
+        (-1 *
+          (e.pageY -
+            this.$refs.cardContainer.offsetTop -
+            this.$refs.cardContainer.offsetHeight / 2)) /
+        10;
     },
     formatCost(cost) {
-      const symbols = cost.match(/{[^{}]+}/g) || [];
-      symbols.forEach((symbol) => {
-        const iconSrc = this.getSymbol(symbol);
-        const iconTag = `<img src="${iconSrc}" class="mana-symbol" />`;
-        cost = cost.replace(symbol, iconTag);
+      return cost.replace(/(\d+|[WUBRGX])/g, (match) => {
+        if (!isNaN(match)) {
+          // If it's a number, return as is
+          return match;
+        } else {
+          // Otherwise, convert to mana symbol
+          const iconSrc = require(`@/assets/mtg-icons/${match.toUpperCase()}.png`);
+          return `<img src="${iconSrc}" class="mana-symbol" />`;
+        }
       });
-      return cost;
     },
     formatDescription(description) {
       const symbols = description.match(/{[^{}]+}/g) || [];
@@ -141,6 +154,14 @@ export default {
   },
 
   computed: {
+    cardFrame() {
+      if (this.cardCost.includes("w")) return this.whiteFrame;
+      if (this.cardCost.includes("u")) return this.blueFrame;
+      if (this.cardCost.includes("b")) return this.blackFrame;
+      if (this.cardCost.includes("r")) return this.redFrame;
+      if (this.cardCost.includes("g")) return this.greenFrame;
+      return this.multicoloredFrame; // Default to multicolored if mixed or none
+    },
     formattedDescription() {
       return this.formatDescription(this.cardDescription);
     },
@@ -152,14 +173,6 @@ export default {
     },
     parsedCost() {
       return this.cardCost.split(/(?<=})|(?={)/g);
-    },
-    cardFrame() {
-      if (this.cardCost.includes("R")) return this.redFrame;
-      if (this.cardCost.includes("U")) return this.blueFrame;
-      if (this.cardCost.includes("B")) return this.blackFrame;
-      if (this.cardCost.includes("G")) return this.greenFrame;
-      if (this.cardCost.includes("W")) return this.whiteFrame;
-      return this.multicoloredFrame;
     },
   },
   watch: {
@@ -251,7 +264,7 @@ export default {
   position: absolute;
   bottom: 16px;
   right: 30px;
-  font-size: 16px; 
+  font-size: 16px;
   cursor: default;
 }
 .mana-symbol {
@@ -260,7 +273,6 @@ export default {
   margin-top: 1px;
   padding: 0;
   vertical-align: middle;
-  
 }
 
 .description-symbol {
